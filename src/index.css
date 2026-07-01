@@ -1,0 +1,62 @@
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: #100d09;
+  color: #ece3d0;
+  font-family: 'Jost', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+#root { min-height: 100vh; }
+::selection { background: #c9a24b40; color: #fff; }
+input::placeholder, textarea::placeholder { color: #6f6650; }
+
+/* ===== shared background blob animations (all pages) ===== */
+@keyframes driftA {
+  0% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(40px,-30px) scale(1.1); }
+  100% { transform: translate(0,0) scale(1); }
+}
+@keyframes driftB {
+  0% { transform: translate(0,0) scale(1.05); }
+  50% { transform: translate(-46px,26px) scale(.95); }
+  100% { transform: translate(0,0) scale(1.05); }
+}
+@keyframes embPulse {
+  0%, 100% { opacity: .4; }
+  50% { opacity: .7; }
+}
+
+/* ===== home + contact candle flame (self-positioned by parent) ===== */
+@keyframes flameSway {
+  0% { transform: rotate(-1.6deg) scale(1,1); }
+  50% { transform: rotate(1.6deg) scale(.97,1.05); }
+  100% { transform: rotate(-1.6deg) scale(1,1); }
+}
+/* ===== home hero-only ===== */
+@keyframes glowPulse {
+  0%, 100% { opacity: .7; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+}
+@keyframes cue {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+@keyframes coreFlicker {
+  0%, 100% { opacity: .95; transform: translateX(-50%) scaleY(1); }
+  40% { opacity: 1; transform: translateX(-51%) scaleY(1.09); }
+  70% { opacity: .82; transform: translateX(-49%) scaleY(.95); }
+}
+/* ===== story pull-quote candle (self-centered via left:50%, bakes translateX into every frame) ===== */
+@keyframes storyFlameSway {
+  0% { transform: translateX(-50%) rotate(-2deg) scale(1,1); }
+  50% { transform: translateX(-50%) rotate(2deg) scale(.97,1.05); }
+  100% { transform: translateX(-50%) rotate(-2deg) scale(1,1); }
+}
+@keyframes storyGlowPulse {
+  0%, 100% { opacity: .6; }
+  50% { opacity: 1; }
+}
