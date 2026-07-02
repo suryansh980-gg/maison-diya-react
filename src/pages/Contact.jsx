@@ -3,6 +3,7 @@ import { s } from '../lib/style';
 import { Hoverable, Focusable } from '../components/Interactive';
 import Layout from '../components/Layout';
 import { footerCols } from '../data/footerCols';
+import { supabase } from '../lib/supabase';
 
 const goldBtnHover = { background: '#dcb764' };
 const inputFocus = { borderColor: '#c9a24b' };
@@ -17,11 +18,38 @@ const contacts = [
   { label: 'Corporate desk', value: 'corporate@maisondiya.in', sub: 'Branded gifting from 25 units' },
 ];
 
+const initialForm = { name: '', email: '', occasion: 'Diwali', quantity: '1–10', message: '' };
+
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState(initialForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const onSubmit = (e) => {
+  const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const onSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError('');
+
+    const { error: insertError } = await supabase
+      .from('contact_submissions')
+      .insert({
+        name: form.name,
+        email: form.email,
+        occasion: form.occasion,
+        quantity: form.quantity,
+        message: form.message,
+      });
+
+    setSubmitting(false);
+
+    if (insertError) {
+      setError('Something went wrong sending your enquiry. Please try again.');
+      return;
+    }
+
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -67,17 +95,17 @@ export default function Contact() {
               <div style={s('display:grid;grid-template-columns:1fr 1fr;gap:18px')}>
                 <label style={s('display:block')}>
                   <span style={s(lblStyle)}>Name</span>
-                  <Focusable required type="text" placeholder="Your name" base={s(inStyle)} focusStyle={inputFocus} />
+                  <Focusable required type="text" placeholder="Your name" value={form.name} onChange={set('name')} base={s(inStyle)} focusStyle={inputFocus} />
                 </label>
                 <label style={s('display:block')}>
                   <span style={s(lblStyle)}>Email</span>
-                  <Focusable required type="email" placeholder="you@email.com" base={s(inStyle)} focusStyle={inputFocus} />
+                  <Focusable required type="email" placeholder="you@email.com" value={form.email} onChange={set('email')} base={s(inStyle)} focusStyle={inputFocus} />
                 </label>
               </div>
               <div style={s('display:grid;grid-template-columns:1fr 1fr;gap:18px')}>
                 <label style={s('display:block')}>
                   <span style={s(lblStyle)}>Occasion</span>
-                  <Focusable as="select" base={s(inStyle)} focusStyle={inputFocus}>
+                  <Focusable as="select" value={form.occasion} onChange={set('occasion')} base={s(inStyle)} focusStyle={inputFocus}>
                     <option>Diwali</option>
                     <option>Wedding</option>
                     <option>Corporate / bulk</option>
@@ -88,7 +116,7 @@ export default function Contact() {
                 </label>
                 <label style={s('display:block')}>
                   <span style={s(lblStyle)}>Quantity</span>
-                  <Focusable as="select" base={s(inStyle)} focusStyle={inputFocus}>
+                  <Focusable as="select" value={form.quantity} onChange={set('quantity')} base={s(inStyle)} focusStyle={inputFocus}>
                     <option>1–10</option>
                     <option>11–25</option>
                     <option>25–100</option>
@@ -103,6 +131,8 @@ export default function Contact() {
                   as="textarea"
                   rows={4}
                   placeholder="Timeline, branding, budget, anything else…"
+                  value={form.message}
+                  onChange={set('message')}
                   base={s(inStyle + 'resize:vertical;font-family:Jost')}
                   focusStyle={inputFocus}
                 />
@@ -110,11 +140,15 @@ export default function Contact() {
               <Hoverable
                 as="button"
                 type="submit"
-                base={s('background:#c9a24b;color:#100d09;border:none;padding:16px 30px;font-family:Jost;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;margin-top:4px')}
-                hoverStyle={goldBtnHover}
+                disabled={submitting}
+                base={s(`background:#c9a24b;color:#100d09;border:none;padding:16px 30px;font-family:Jost;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;cursor:${submitting ? 'default' : 'pointer'};margin-top:4px;opacity:${submitting ? '.7' : '1'}`)}
+                hoverStyle={submitting ? {} : goldBtnHover}
               >
-                Send enquiry
+                {submitting ? 'Sending…' : 'Send enquiry'}
               </Hoverable>
+              {error && (
+                <p style={s('font-size:12.5px;color:#e08a6a;text-align:center;margin:2px 0 0;letter-spacing:.04em')}>{error}</p>
+              )}
               <p style={s('font-size:11.5px;color:#6f6650;text-align:center;margin:2px 0 0;letter-spacing:.04em')}>We reply within one business day. No spam, ever.</p>
             </form>
           )}
